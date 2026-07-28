@@ -123,36 +123,6 @@ export function WelcomeStep() {
           />
         </div>
       </div>
-
-      <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white rounded-lg border border-slate-200 p-4">
-          <h4 className="font-semibold text-slate-700 text-sm mb-1">
-            Structural Holes
-          </h4>
-          <p className="text-xs text-slate-500">
-            Discover where you bridge disconnected groups — and the advantage that
-            creates. (Ron Burt)
-          </p>
-        </div>
-        <div className="bg-white rounded-lg border border-slate-200 p-4">
-          <h4 className="font-semibold text-slate-700 text-sm mb-1">
-            Strength of Weak Ties
-          </h4>
-          <p className="text-xs text-slate-500">
-            Learn why your casual acquaintances may be your most valuable
-            connections. (Mark Granovetter)
-          </p>
-        </div>
-        <div className="bg-white rounded-lg border border-slate-200 p-4">
-          <h4 className="font-semibold text-slate-700 text-sm mb-1">
-            Network Density
-          </h4>
-          <p className="text-xs text-slate-500">
-            Understand the tradeoff between trust (dense networks) and information
-            diversity (sparse networks).
-          </p>
-        </div>
-      </div>
     </div>
   )
 }
