@@ -1,4 +1,3 @@
-import { useRef } from 'react'
 import { useNetworkStore } from '../../store/useNetworkStore'
 
 export function WelcomeStep() {
@@ -6,24 +5,8 @@ export function WelcomeStep() {
   const studentName = useNetworkStore((s) => s.studentName)
   const setStudentName = useNetworkStore((s) => s.setStudentName)
   const connections = useNetworkStore((s) => s.connections)
-  const importData = useNetworkStore((s) => s.importData)
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const hasExistingData = connections.length > 0
-
-  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = (ev) => {
-      const json = ev.target?.result as string
-      const success = importData(json)
-      if (!success) {
-        alert('Invalid file format. Please select a valid network data JSON file.')
-      }
-    }
-    reader.readAsText(file)
-  }
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -101,26 +84,6 @@ export function WelcomeStep() {
           >
             {hasExistingData ? 'Continue where you left off' : 'Get started'}
           </button>
-
-          <div className="flex items-center gap-3 text-xs text-slate-400">
-            <div className="flex-1 h-px bg-slate-200" />
-            <span>or</span>
-            <div className="flex-1 h-px bg-slate-200" />
-          </div>
-
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="w-full border border-slate-300 text-slate-600 py-2 px-4 rounded-lg text-sm hover:bg-slate-50 transition-colors"
-          >
-            Import previous data (JSON)
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".json"
-            onChange={handleImport}
-            className="hidden"
-          />
         </div>
       </div>
     </div>
