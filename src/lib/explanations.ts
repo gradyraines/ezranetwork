@@ -1,7 +1,6 @@
 interface Explanation {
   theoryConnection: string
   explanation: string
-  insight: string
 }
 
 export function getExplanation(
@@ -15,14 +14,10 @@ export function getExplanation(
         theoryConnection: 'Network composition',
         explanation:
           value < 10
-            ? `You listed ${value} connections. Consider whether there are additional professional contacts you interact with regularly.`
+            ? `A count of the people you listed. Every other metric is computed from these contacts and the ties you drew among them. You named ${value}. The structure metrics get more reliable once you pass ten or so, because each one works on pairs of contacts.`
             : value < 20
-              ? `You have ${value} connections — a solid professional network that gives you access to diverse resources.`
-              : `With ${value} connections, you have a large network. The question is how well-structured it is — size alone doesn't guarantee advantage.`,
-        insight:
-          value < 10
-            ? 'Try to think of people across different parts of your professional life — different teams, organizations, or social contexts.'
-            : 'Network size matters, but structure matters more. The metrics below reveal whether your connections give you real advantage.',
+              ? `A count of the people you listed. Every other metric is computed from these contacts and the ties you drew among them. You named ${value}, which is typical for this exercise.`
+              : `A count of the people you listed. Every other metric is computed from these contacts and the ties you drew among them. You named ${value}, more than most people manage. Past this point the structure of the network matters more than the raw count.`,
       }
 
     case 'density':
@@ -30,16 +25,10 @@ export function getExplanation(
         theoryConnection: 'Network closure vs. structural holes (Burt, 1992)',
         explanation:
           value < 0.3
-            ? `Your network density is low (${(value * 100).toFixed(0)}%). Most of your contacts don't know each other. This is a "sparse" network with many structural holes.`
+            ? `Density is the share of pairs among your contacts who know each other. The tool counts every possible pair, checks whether you marked a tie between them, and divides. At ${(value * 100).toFixed(0)}%, most pairs in your network are strangers to each other. Burt calls these gaps structural holes, and they are where brokerage happens.`
             : value < 0.6
-              ? `Your network has moderate density (${(value * 100).toFixed(0)}%). Some of your contacts know each other, but there are gaps between groups.`
-              : `Your network is quite dense (${(value * 100).toFixed(0)}%). Most of your contacts know each other, creating a "closed" network.`,
-        insight:
-          value < 0.3
-            ? 'A sparse network is great for accessing diverse information and brokering between groups. You likely hear about things before others do.'
-            : value < 0.6
-              ? 'A moderate density is often ideal — you have some closed groups that provide trust and support, plus gaps that give you brokerage opportunities.'
-              : 'Dense networks provide trust and cooperation, but your contacts likely share the same information. Consider building connections to people outside your current circle.',
+              ? `Density is the share of pairs among your contacts who know each other. The tool counts every possible pair, checks whether you marked a tie between them, and divides. At ${(value * 100).toFixed(0)}%, parts of your network cluster together while gaps remain between the clusters.`
+              : `Density is the share of pairs among your contacts who know each other. The tool counts every possible pair, checks whether you marked a tie between them, and divides. At ${(value * 100).toFixed(0)}%, most of your contacts know each other. Closed networks are good at trust and mutual help. They also tend to pass the same information around.`,
       }
 
     case 'constraint':
@@ -47,35 +36,22 @@ export function getExplanation(
         theoryConnection: "Burt's structural holes theory (1992)",
         explanation:
           value < 0.3
-            ? `Your constraint score is low (${value.toFixed(2)}). Your contacts are not heavily connected to each other, giving you freedom to broker between groups.`
+            ? `Constraint measures how much your contacts overlap. For each person, it asks how much of your network leads back to that same group, then adds it up. Yours is ${value.toFixed(2)}, which is low. You sit between groups that mostly ignore each other, and Burt found that this position pays: people with low constraint tend to get better ideas and earlier promotions.`
             : value < 0.5
-              ? `Your constraint is moderate (${value.toFixed(2)}). Some of your contacts know each other, but you still have room to bridge different groups.`
-              : `Your constraint is high (${value.toFixed(2)}). Your contacts are densely connected to each other, which limits your brokerage opportunities.`,
-        insight:
-          value < 0.3
-            ? 'Low constraint means you sit between groups that don\'t interact — a structurally advantageous position. Research shows this is associated with better ideas, faster promotions, and higher pay.'
-            : value < 0.5
-              ? 'You have some structural holes to exploit. Look for the groups in your network that aren\'t connected — these are your brokerage opportunities.'
-              : 'High constraint means your network is redundant — everyone knows everyone. To gain a structural advantage, build connections to people in entirely different circles.',
+              ? `Constraint measures how much your contacts overlap. For each person, it asks how much of your network leads back to that same group, then adds it up. Yours is ${value.toFixed(2)}, in the middle range. Some of your contacts know each other, and you still bridge a few separate groups.`
+              : `Constraint measures how much your contacts overlap. For each person, it asks how much of your network leads back to that same group, then adds it up. Yours is ${value.toFixed(2)}, which is high. Most paths through your network loop back to the same people, so there is little left for you to broker.`,
       }
 
     case 'effectiveSize': {
-      const ratio =
-        networkSize && networkSize > 0 ? value / networkSize : 0
+      const ratio = networkSize && networkSize > 0 ? value / networkSize : 0
       return {
         theoryConnection: "Burt's effective network size (1992)",
         explanation:
           ratio > 0.8
-            ? `Your effective network size is ${value.toFixed(1)} out of ${networkSize} contacts — most of your connections are non-redundant.`
+            ? `Effective size discounts your network for redundancy. A contact counts for less when they know the same people you already reach. Five contacts who all know each other amount to roughly one effective contact. Yours is ${value.toFixed(1)} out of ${networkSize}, so almost every contact opens a different door.`
             : ratio > 0.5
-              ? `Your effective size is ${value.toFixed(1)} out of ${networkSize}. About half your network provides unique, non-overlapping access to information.`
-              : `Your effective size is ${value.toFixed(1)} out of ${networkSize}. Many of your contacts are connected to each other, making parts of your network redundant.`,
-        insight:
-          ratio > 0.8
-            ? 'Each of your connections provides access to different people and information. This is an efficient, well-structured network.'
-            : ratio > 0.5
-              ? 'Some of your connections are redundant — they give you access to the same people and information. That\'s not necessarily bad (it provides reliability), but it limits your reach.'
-              : 'Much of your network is redundant. To increase your effective size, build relationships with people who aren\'t already connected to your existing contacts.',
+              ? `Effective size discounts your network for redundancy. A contact counts for less when they know the same people you already reach. Five contacts who all know each other amount to roughly one effective contact. Yours is ${value.toFixed(1)} out of ${networkSize}. Around half your network is unique reach, and the rest overlaps.`
+              : `Effective size discounts your network for redundancy. A contact counts for less when they know the same people you already reach. Five contacts who all know each other amount to roughly one effective contact. Yours is ${value.toFixed(1)} out of ${networkSize}. Much of your network reaches the same people, which is reliable but narrow.`,
       }
     }
 
@@ -85,16 +61,10 @@ export function getExplanation(
           'Brokerage and structural holes (Burt, 1992; Granovetter, 1973)',
         explanation:
           value > 0.7
-            ? `Your brokerage score is high (${(value * 100).toFixed(0)}%). Most pairs of your contacts don't know each other, putting you in a strong brokerage position.`
+            ? `The share of pairs among your contacts with no tie between them. Every disconnected pair is a bridge that runs through you, because you are the one person both sides know. At ${(value * 100).toFixed(0)}%, you connect people who would otherwise never meet. Information crosses from one side of your network to the other only if you carry it.`
             : value > 0.4
-              ? `Your brokerage score is moderate (${(value * 100).toFixed(0)}%). You bridge some disconnected groups but others are well-connected.`
-              : `Your brokerage score is low (${(value * 100).toFixed(0)}%). Most of your contacts already know each other, leaving few brokerage opportunities.`,
-        insight:
-          value > 0.7
-            ? 'You\'re a broker — you connect people who don\'t otherwise interact. This gives you control over information flow and the ability to combine ideas from different worlds.'
-            : value > 0.4
-              ? 'You have brokerage potential. Identify the specific groups in your network that aren\'t connected — those are the structural holes where you add the most value.'
-              : 'Your network has few structural holes. Consider meeting people from industries, organizations, or social circles different from your current contacts.',
+              ? `The share of pairs among your contacts with no tie between them. Every disconnected pair is a bridge that runs through you, because you are the one person both sides know. At ${(value * 100).toFixed(0)}%, you bridge some groups while others are already connected without you.`
+              : `The share of pairs among your contacts with no tie between them. Every disconnected pair is a bridge that runs through you, because you are the one person both sides know. At ${(value * 100).toFixed(0)}%, your contacts mostly know each other already, so there is little between them for you to broker.`,
       }
 
     case 'tieStrengthDistribution':
@@ -102,23 +72,16 @@ export function getExplanation(
         theoryConnection: 'Strength of weak ties (Granovetter, 1973)',
         explanation:
           value > 0.4
-            ? `${(value * 100).toFixed(0)}% of your ties are weak. Granovetter showed that weak ties — casual acquaintances — are often more valuable than strong ties for discovering new opportunities.`
+            ? `Your mix of strong, moderate, and weak ties. The number to watch is the weak share. Granovetter's point was that acquaintances move in circles you don't, so news tends to reach you through them. Weak ties are ${(value * 100).toFixed(0)}% of your network, which is a lot of reach into other circles. Jobs and opportunities travel exactly this way.`
             : value > 0.15
-              ? `${(value * 100).toFixed(0)}% of your ties are weak. You have a mix of close relationships and more distant connections.`
-              : `Only ${(value * 100).toFixed(0)}% of your ties are weak. Most of your network consists of strong or moderate relationships.`,
-        insight:
-          value > 0.4
-            ? 'Your high proportion of weak ties is a strength for information access. Weak ties bridge social worlds and expose you to non-redundant information — they\'re how most people find jobs and discover opportunities.'
-            : value > 0.15
-              ? 'A healthy mix. Strong ties provide trust and deep support, while weak ties provide novel information. Consider whether your weak ties span different industries or organizations.'
-              : 'A network dominated by strong ties is comfortable but may limit your exposure to new ideas. The people you interact with rarely — former colleagues, conference contacts, distant alumni — often provide the most novel and valuable information.',
+              ? `Your mix of strong, moderate, and weak ties. The number to watch is the weak share. Granovetter's point was that acquaintances move in circles you don't, so news tends to reach you through them. Weak ties are ${(value * 100).toFixed(0)}% of your network, alongside a core of closer relationships. The strong ties carry support, and the weak ones carry news.`
+              : `Your mix of strong, moderate, and weak ties. The number to watch is the weak share. Granovetter's point was that acquaintances move in circles you don't, so news tends to reach you through them. Weak ties are only ${(value * 100).toFixed(0)}% of your network. A close-knit network is comfortable, and it mostly tells you things you already know.`,
       }
 
     default:
       return {
         theoryConnection: '',
         explanation: '',
-        insight: '',
       }
   }
 }

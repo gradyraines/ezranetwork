@@ -47,6 +47,41 @@ function createEmptyConnection(): Connection {
     orgContext: 'same_team' as OrgContext,
     interactionFrequency: 'monthly' as InteractionFrequency,
     resources: [] as ResourceType[],
+    rank: 'same',
+    ratings: {
+      difficultyComfort: 3,
+      hopesComfort: 3,
+      completeTaskTrust: 3,
+      hourFavorObligation: 3,
+      dayFavorObligation: 3,
+    },
+  }
+}
+
+// Resource categories changed to match the original questionnaire; map any
+// values saved under the previous scheme.
+const LEGACY_RESOURCE_MAP: Record<string, ResourceType> = {
+  advice: 'career_info',
+  information: 'career_info',
+  career_opportunities: 'career_info',
+  task_help: 'task_help',
+  emotional_support: 'social',
+}
+
+function upgradeConnection(c: Partial<Connection> & { resources?: string[] }): Connection {
+  const base = createEmptyConnection()
+  const resources = Array.from(
+    new Set(
+      (c.resources ?? []).map((r) => LEGACY_RESOURCE_MAP[r] ?? (r as ResourceType))
+    )
+  )
+  return {
+    ...base,
+    ...c,
+    id: c.id ?? base.id,
+    resources,
+    rank: c.rank ?? base.rank,
+    ratings: { ...base.ratings, ...(c.ratings ?? {}) },
   }
 }
 
@@ -125,7 +160,7 @@ export const useNetworkStore = create<NetworkStore>()(
           if (data.connections && Array.isArray(data.connections)) {
             set({
               studentName: data.studentName || '',
-              connections: data.connections,
+              connections: data.connections.map(upgradeConnection),
               matrix: data.matrix || [],
               currentStep: 1,
             })
@@ -139,6 +174,14 @@ export const useNetworkStore = create<NetworkStore>()(
     }),
     {
       name: 'network-tool-data',
+      version: 1,
+      migrate: (persisted: unknown) => {
+        const state = persisted as { connections?: Partial<Connection>[] } | undefined
+        if (state?.connections) {
+          state.connections = state.connections.map(upgradeConnection)
+        }
+        return state
+      },
     }
   )
 )

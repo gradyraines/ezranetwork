@@ -2,7 +2,9 @@ import { useState, useMemo } from 'react'
 import { useNetworkStore } from '../../store/useNetworkStore'
 import { NetworkGraph } from '../visualization/NetworkGraph'
 import { MetricCard } from './MetricCard'
+import { ClassComparison } from './ClassComparison'
 import { computeMetrics } from '../../lib/metrics'
+import { computeClassicMetrics } from '../../lib/classicMetrics'
 import type { Core } from 'cytoscape'
 
 export function InsightsDashboard() {
@@ -16,6 +18,11 @@ export function InsightsDashboard() {
 
   const metrics = useMemo(
     () => computeMetrics(connections, matrix),
+    [connections, matrix]
+  )
+
+  const classicMetrics = useMemo(
+    () => computeClassicMetrics(connections, matrix),
     [connections, matrix]
   )
 
@@ -100,6 +107,9 @@ export function InsightsDashboard() {
           />
         ))}
       </div>
+
+      {/* Historical cohort comparison */}
+      <ClassComparison metrics={classicMetrics} />
 
       <div className="flex gap-3 pt-2">
         <button

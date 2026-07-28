@@ -5,7 +5,6 @@ export interface MetricResult {
   formattedValue: string
   theoryConnection: string
   explanation: string
-  insight: string
   highlightNodeIds?: string[]
   highlightEdgeIds?: string[]
 }

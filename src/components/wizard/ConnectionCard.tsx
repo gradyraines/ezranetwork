@@ -1,4 +1,5 @@
-import type { Connection, RelationshipType, TieStrength, OrgContext, InteractionFrequency, ResourceType } from '../../types/network'
+import type { Connection, ConnectionRatings, RelationshipType, TieStrength, OrgContext, InteractionFrequency, ResourceType, RelativeRank } from '../../types/network'
+import { RESOURCE_LABELS } from '../../types/network'
 import { useNetworkStore } from '../../store/useNetworkStore'
 
 const RELATIONSHIP_OPTIONS: { value: RelationshipType; label: string }[] = [
@@ -28,12 +29,24 @@ const FREQUENCY_OPTIONS: { value: InteractionFrequency; label: string }[] = [
   { value: 'rarely', label: 'Rarely' },
 ]
 
-const RESOURCE_OPTIONS: { value: ResourceType; label: string }[] = [
-  { value: 'advice', label: 'Advice' },
-  { value: 'emotional_support', label: 'Emotional support' },
-  { value: 'career_opportunities', label: 'Career opportunities' },
-  { value: 'information', label: 'Information' },
-  { value: 'task_help', label: 'Task help' },
+const RESOURCE_OPTIONS = (
+  Object.entries(RESOURCE_LABELS) as [ResourceType, string][]
+).map(([value, label]) => ({ value, label }))
+
+const RANK_OPTIONS: { value: RelativeRank; label: string }[] = [
+  { value: 'higher', label: 'Higher rank' },
+  { value: 'same', label: 'About the same' },
+  { value: 'lower', label: 'Lower rank' },
+]
+
+// Wording carried over from the original questionnaire so trust and
+// obligation scores stay comparable to historical cohorts.
+const RATING_ITEMS: { key: keyof ConnectionRatings; label: string }[] = [
+  { key: 'difficultyComfort', label: 'I feel comfortable sharing my personal problems and difficulties with this person.' },
+  { key: 'hopesComfort', label: 'I feel comfortable sharing my hopes and dreams with this person.' },
+  { key: 'completeTaskTrust', label: 'I trust this person to complete a task they agreed to do for me.' },
+  { key: 'hourFavorObligation', label: 'I would feel obliged if this person asked a favor requiring 1 hour of my time in a busy week.' },
+  { key: 'dayFavorObligation', label: 'I would feel obliged if this person asked a favor requiring 1 day of my time in a busy week.' },
 ]
 
 interface ConnectionCardProps {
@@ -119,6 +132,24 @@ export function ConnectionCard({ connection, index }: ConnectionCardProps) {
             ))}
           </select>
         </div>
+
+        {/* Relative Rank */}
+        <div>
+          <label className="block text-xs font-medium text-slate-500 mb-1">
+            Their rank compared to yours
+          </label>
+          <select
+            value={connection.rank}
+            onChange={(e) => update({ rank: e.target.value as RelativeRank })}
+            className="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-400"
+          >
+            {RANK_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Tie Strength */}
@@ -184,6 +215,44 @@ export function ConnectionCard({ connection, index }: ConnectionCardProps) {
             >
               {o.label}
             </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Trust & obligation ratings */}
+      <div className="pt-2 border-t border-slate-100">
+        <label className="block text-xs font-medium text-slate-500 mb-2">
+          Rate your agreement (1 = strongly disagree, 5 = strongly agree)
+        </label>
+        <div className="space-y-2">
+          {RATING_ITEMS.map((item) => (
+            <div key={item.key} className="flex items-center justify-between gap-3">
+              <span className="text-xs text-slate-600 leading-snug">
+                {item.label}
+              </span>
+              <div className="flex gap-1 shrink-0">
+                {[1, 2, 3, 4, 5].map((v) => (
+                  <button
+                    key={v}
+                    type="button"
+                    aria-label={`${v} out of 5`}
+                    aria-pressed={connection.ratings[item.key] === v}
+                    onClick={() =>
+                      update({
+                        ratings: { ...connection.ratings, [item.key]: v },
+                      })
+                    }
+                    className={`w-6 h-6 text-xs font-medium rounded-full border transition-colors ${
+                      connection.ratings[item.key] === v
+                        ? 'bg-slate-800 text-white border-slate-800'
+                        : 'bg-white text-slate-500 border-slate-300 hover:border-slate-400'
+                    }`}
+                  >
+                    {v}
+                  </button>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       </div>
