@@ -16,9 +16,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-6">
         {children}
       </main>
-      <footer className="border-t border-slate-200 bg-white py-3 text-center text-xs text-slate-400">
-        Built on network science from Burt, Granovetter, and Lin
-      </footer>
     </div>
   )
 }
