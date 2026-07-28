@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { useNetworkStore } from '../../store/useNetworkStore'
 import { ConnectionCard } from './ConnectionCard'
 import { NetworkGraph } from '../visualization/NetworkGraph'
@@ -8,6 +9,24 @@ export function ConnectionsStep() {
   const connections = useNetworkStore((s) => s.connections)
   const addConnection = useNetworkStore((s) => s.addConnection)
   const setStep = useNetworkStore((s) => s.setStep)
+
+  const listRef = useRef<HTMLDivElement>(null)
+  const scrollToNewCard = useRef(false)
+
+  const handleAddConnection = () => {
+    scrollToNewCard.current = true
+    addConnection()
+  }
+
+  // After a card is added via the button, scroll it into view and focus its name field
+  useEffect(() => {
+    if (!scrollToNewCard.current) return
+    scrollToNewCard.current = false
+    const lastCard = listRef.current?.lastElementChild as HTMLElement | null
+    if (!lastCard) return
+    lastCard.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    lastCard.querySelector('input')?.focus({ preventScroll: true })
+  }, [connections.length])
 
   const namedConnections = connections.filter((c) => c.name.trim())
   const canProceed = namedConnections.length >= MIN_CONNECTIONS
@@ -51,14 +70,17 @@ export function ConnectionsStep() {
           />
         </div>
 
-        <div className="space-y-3 max-h-[calc(100vh-320px)] overflow-y-auto pr-1">
+        <div
+          ref={listRef}
+          className="space-y-3 max-h-[calc(100vh-320px)] overflow-y-auto pr-1"
+        >
           {connections.map((connection, i) => (
             <ConnectionCard key={connection.id} connection={connection} index={i} />
           ))}
         </div>
 
         <button
-          onClick={addConnection}
+          onClick={handleAddConnection}
           className="w-full border-2 border-dashed border-slate-300 text-slate-500 py-3 rounded-lg text-sm font-medium hover:border-slate-400 hover:text-slate-600 transition-colors"
         >
           + Add connection

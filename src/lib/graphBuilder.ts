@@ -1,4 +1,5 @@
 import type { Connection, MatrixEntry } from '../types/network'
+import { RESOURCE_LABELS } from '../types/network'
 import type { ElementDefinition } from 'cytoscape'
 
 const ORG_COLORS: Record<string, string> = {
@@ -43,7 +44,7 @@ export function buildElements(
         tieStrength: conn.tieStrength,
         relationshipType: conn.relationshipType,
         interactionFrequency: conn.interactionFrequency,
-        resources: conn.resources.join(', '),
+        resources: conn.resources.map((r) => RESOURCE_LABELS[r]).join(', '),
       },
     })
   }
